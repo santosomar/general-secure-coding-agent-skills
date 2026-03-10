@@ -6,7 +6,7 @@ metadata:
   category: "requirements"
   suite: "general-secure-coding-agent-skills"
   version: "0.2.0"
-  related: "nl-to-constraints, traceability-matrix-generator, acceptance-test-generator"
+  related: "nl-to-constraints, traceability-matrix-generator, scenario-generator"
 ---
 
 # Req-to-Test

@@ -6,7 +6,7 @@ metadata:
   category: "code-analysis"
   suite: "general-secure-coding-agent-skills"
   version: "0.2.0"
-  related: "legacy-code-summarizer, architecture-recoverer"
+  related: "legacy-code-summarizer, component-boundary-identifier"
 ---
 
 # Code Summarizer

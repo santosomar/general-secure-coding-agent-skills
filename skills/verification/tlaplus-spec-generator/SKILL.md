@@ -6,7 +6,7 @@ metadata:
   category: "verification"
   suite: "general-secure-coding-agent-skills"
   version: "0.2.0"
-  related: "requirement-to-tlaplus-property-generator, tlaplus-proof-assistant"
+  related: "requirement-to-tlaplus-property-generator"
 ---
 
 # TLA+ Spec Generator
@@ -17,7 +17,7 @@ Turn a prose description of a concurrent or distributed system into a TLA+ modul
 
 TLA+ is for: nondeterminism, concurrency, message-passing, protocols, state machines — anything where *interleaving* matters.
 
-TLA+ is **not** for: sequential algorithms, data-structure invariants within one thread, arithmetic correctness, type-level properties. For those → `dafny-spec-generator` or `lean4-spec-generator`.
+TLA+ is **not** for: sequential algorithms, data-structure invariants within one thread, arithmetic correctness, type-level properties. For those → `cpp-to-dafny-translator` or → `c-cpp-to-lean4-translator`.
 
 Rule of thumb: if the bug you're afraid of requires two things happening "at the same time," use TLA+. If it's "this function returns the wrong value," don't.
 
@@ -115,7 +115,7 @@ PROPERTIES
     <LivenessProp>
 ```
 
-**Keep constants tiny.** 2–3 elements per set, small bounds on naturals. The interesting bugs appear with 2 or 3 processes. If your bug needs 50 processes to manifest, TLA+ model checking won't find it anyway — use → `tlaplus-proof-assistant` instead.
+**Keep constants tiny.** 2–3 elements per set, small bounds on naturals. The interesting bugs appear with 2 or 3 processes. If your bug needs 50 processes to manifest, TLA+ model checking won't find it anyway — write a TLAPS proof by hand.
 
 ## Worked example
 

@@ -6,7 +6,7 @@ metadata:
   category: "devops"
   suite: "general-secure-coding-agent-skills"
   version: "0.2.0"
-  related: "ci-pipeline-synthesizer, k8s-manifest-generator"
+  related: "ci-pipeline-synthesizer"
 ---
 
 # Containerization Assistant
