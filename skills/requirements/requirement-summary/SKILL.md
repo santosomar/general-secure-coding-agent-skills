@@ -1,28 +1,37 @@
 ---
 name: requirement-summary
-description: Produces structured, high-level summaries of requirement sets for stakeholder communication. Use when creating stakeholder-facing summaries, when the user asks for a requirement summary for stakeholders, or when communicating requirements to non-technical audiences.
+description: Alias for requirement-summarizer. Produces a structured summary of a requirements document — the key obligations, grouped by actor and concern, with the MUST/SHOULD/MAY breakdown. Use when onboarding to a large spec, when deciding what to implement first, or when the user asks what a standard actually requires.
 license: Apache-2.0
 metadata:
   category: "requirements"
   suite: "general-secure-coding-agent-skills"
-  version: "0.2.0"
+  version: "0.3.0"
+  related: "requirement-summarizer"
 ---
 
 # Requirement Summary
 
-## Purpose
+**This skill is an alias.** → `requirement-summarizer` for the full workflow.
 
-Produce structured, high-level summaries for stakeholder communication.
+The two names exist because "summary" (the noun — the artifact you want) and "summarizer" (the verb — the thing that produces it) both get asked for. They mean the same thing. Follow the link.
 
-## Workflow
+## Quick reference
 
-1. **Input**: Requirement set.
-2. **Structure**: Organize by theme, priority, or stakeholder.
-3. **Summarize**: High-level, non-technical language.
-4. **Output**: Structured summary (sections, bullets).
+What the target skill does:
 
-## Output
+| Input                    | Output                                                   |
+| ------------------------ | -------------------------------------------------------- |
+| Requirements document    | Obligations table: actor → MUST / SHOULD / MAY           |
+| RFC / standard           | Normative statements extracted, informative prose stripped |
+| Long spec                | Grouped by concern (auth, storage, transport, …)         |
 
-- Structured summary for stakeholders
-- Key themes and priorities
-- Traceability to detailed requirements
+## When you're here by mistake
+
+| You actually wanted…                                       | Go to                                 |
+| ---------------------------------------------------------- | ------------------------------------- |
+| To compare two versions of requirements                    | → `requirement-comparison-reporter`   |
+| To check if code covers requirements                       | → `requirement-coverage-checker`      |
+| To make one vague requirement precise                      | → `requirement-enhancer`              |
+| To turn a requirement into concrete test scenarios         | → `scenario-generator`                |
+
+Otherwise: → `requirement-summarizer`.

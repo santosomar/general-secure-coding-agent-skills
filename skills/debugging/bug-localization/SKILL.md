@@ -23,7 +23,7 @@ Different signals demand different first moves. Pick the row that matches:
 | Failing test, no trace             | Read the failing assertion                         | Find producer of the asserted value     |
 | Wrong output, no test              | Diff actual vs expected — identify which field(s)  | Trace producer of divergent field       |
 | "Broke after upgrading X"          | Search for callsites into X                        | → `regression-root-cause-analyzer`      |
-| "Broke in commit range A..B"       | Don't read code first — bisect                     | → `git-bisect-automator`                |
+| "Broke in commit range A..B"       | Don't read code first — bisect                     | → `regression-root-cause-analyzer`      |
 | Log shows error                    | grep for the error string literal                  | Find the condition that triggers it     |
 | Intermittent / "sometimes"         | Do **not** stare at code; reproduce first          | → `bug-reproduction-test-generator`     |
 

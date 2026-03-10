@@ -6,7 +6,7 @@ metadata:
   category: "testing"
   suite: "general-secure-coding-agent-skills"
   version: "0.2.0"
-  related: "coverage-analyzer, mock-stub-generator, test-oracle-generator"
+  related: "coverage-enhancer, mocking-test-generator, test-oracle-generator"
 ---
 
 # Unit Test Generator
@@ -194,7 +194,7 @@ Seven tests. Every branch taken, boundary pinned, clock deterministic. No test c
 - **Private function:** Don't reach in. Test through the public caller. If there *is* no public caller, the function is dead or the design is inside-out — flag it, don't contort the test.
 - **Hard-to-construct inputs** (deeply nested objects, many required fields): Build one test-data factory with sensible defaults and `**overrides`, reuse it. Don't inline 30 lines of setup per test — nobody can tell what's significant.
 - **Code that catches everything** (`except Exception: log; pass`): You can only test that it *doesn't* raise, which is nearly worthless. Note in output: *"Error path is swallowed at line N — consider narrowing the catch or re-raising so failures are observable."*
-- **Randomness or concurrency inside the unit:** Seed the RNG or inject it. If concurrency is load-bearing to the behavior, this isn't a unit test — → `integration-test-generator` or → `property-based-test-generator`.
+- **Randomness or concurrency inside the unit:** Seed the RNG or inject it. If concurrency is load-bearing to the behavior, this isn't a unit test — hand off to → `metamorphic-test-generator` or an integration harness.
 
 ## Do not
 

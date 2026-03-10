@@ -1,37 +1,57 @@
 # Skill Packs Overview
 
-| Pack                                    | Category      | Prefix          |
-| --------------------------------------- | ------------- | --------------- |
-| Bug-Fixing Suite                        | debugging     | `debugging-`    |
-| DevOps Automation Toolkit               | devops        | `devops-`       |
-| Code Quality Toolkit                    | code-quality  | `code-quality-` |
-| Security Scanner Suite                  | security      | `security-`     |
-| Formal Verification Toolkit             | verification  | `verification-` |
-| Code Understanding & Manipulation Suite | code-analysis | `code-analysis-`|
-| Requirements Engineering Suite          | requirements  | `requirements-` |
-| Test Automation Suite                   | testing       | `testing-`      |
+| Pack                                    | Category      | Directory              |
+| --------------------------------------- | ------------- | ---------------------- |
+| Bug-Fixing Suite                        | debugging     | `skills/debugging/`    |
+| DevOps Automation Toolkit               | devops        | `skills/devops/`       |
+| Code Quality Toolkit                    | code-quality  | `skills/code-quality/` |
+| Security Scanner Suite                  | security      | `skills/security/`     |
+| Formal Verification Toolkit             | verification  | `skills/verification/` |
+| Code Understanding & Manipulation Suite | code-analysis | `skills/code-analysis/`|
+| Requirements Engineering Suite          | requirements  | `skills/requirements/` |
+| Test Automation Suite                   | testing       | `skills/testing/`      |
 
 ### Naming Convention
 
-Every skill directory is named `<category-prefix><original-skill-name>`, matching the pattern established by `debugging-bug-localization` and `debugging-bug-to-patch-generator`.
+Each skill lives at `skills/<category>/<skill-name>/SKILL.md`. The frontmatter `name:` field is identical to the directory name — no category prefix is embedded in the skill name itself. The category is encoded by the parent directory and duplicated in `metadata.category` for tools that read the file without its filesystem context.
 
-**Exception — redundant-stem rule.** If the original skill name already begins with the category label (or its obvious stem — `requirement` → `requirements`, `test` → `testing`, `security` → `security`), the prefix is **omitted** to avoid stutter like `security-security-patch-advisor`. All such cases are flagged inline with ⁂ so you can override if you prefer the mechanical prefix everywhere.
-
-The `code-` stem is **not** treated as a skip trigger, because it would not disambiguate `code-quality-*` from `code-analysis-*`.
-
-All final names have been checked against the Cursor skill-name limit of 64 characters; the longest (`verification-requirement-to-tlaplus-property-generator` and `verification-specification-to-temporal-logic-generator`, both 54) are comfortably under.
+Names are lowercase letters, digits, and hyphens only; no leading/trailing or consecutive hyphens; ≤64 characters. The longest in the suite (`requirement-to-tlaplus-property-generator`, `specification-to-temporal-logic-generator`, both 41) are comfortably under.
 
 ### Cross-Cutting Ownership
 
 Several skills serve more than one suite. Each is **defined once under its primary category** and merely *referenced* (not re-implemented) by secondary suites. Primary assignment follows the skill's core competency, not its consumer.
+
+```mermaid
+flowchart LR
+    DBG[debugging]
+    DEV[devops]
+    CQ[code-quality]
+    SEC[security]
+    VER[verification]
+    CA[code-analysis]
+    REQ[requirements]
+    TST[testing]
+
+    DBG -- 2 --> SEC
+    DBG -- 1 --> TST
+    CQ  -- 5 --> CA
+    CA  -- 3 --> CQ
+    DEV -- 1 --> CA
+    VER -- 2 --> REQ
+    VER -- 1 --> TST
+    REQ -- 1 --> TST
+
+    linkStyle 2 stroke-width:3px
+    linkStyle 3 stroke-width:3px
+```
+
+Edges are *suite-A lends N skills to suite-B*. `verification` is a pure producer (never consumes), `testing` a pure consumer (never lends). The thick `code-quality ⇄ code-analysis` pair is the only bidirectional coupling in the suite — quality gates transform code, understanding describes it, and each needs the other.
 
 | Skill                                      | Primary owner     | Referenced by             | Rationale                                                          |
 | ------------------------------------------ | ----------------- | ------------------------- | ------------------------------------------------------------------ |
 | `bug-reproduction-test-generator`          | **debugging**     | testing                   | The artifact is a test, but the driving workflow is bug repro.     |
 | `static-bug-detector`                      | **debugging**     | security                  | General-purpose bug finding; security is one consumer.             |
 | `semantic-bug-detector`                    | **debugging**     | security                  | Same as above.                                                     |
-| `vulnerability-root-cause-analyzer`        | **security**      | debugging                 | Root-causing a *vulnerability* is inherently a security activity.  |
-| `time-aware-dependency-cve-scanner`        | **security**      | devops                    | CVE correlation is security; devops wires it into pipelines.       |
 | `behavior-preservation-checker`            | **code-quality**  | code-analysis             | It is a quality *gate* for refactoring work.                       |
 | `semantic-equivalence-verifier`            | **code-quality**  | code-analysis             | Same — the verification target is a quality transformation.        |
 | `code-refactoring-assistant`               | **code-quality**  | code-analysis             | Refactoring is a quality-improvement act.                          |
@@ -72,7 +92,28 @@ A comprehensive toolkit covering the full bug resolution lifecycle — from dete
 | `debugging-semantic-szz-analyzer`              | Extends classic SZZ with semantic code understanding to reduce false positives and improve accuracy of bug-introducing commit identification. |
 | `debugging-counterexample-debugger`            | Uses counterexamples produced by formal verifiers or model checkers to debug the precise failing execution trace.                             |
 | `debugging-runtime-error-explainer`            | Translates cryptic runtime errors (stack overflows, segfaults, exceptions) into clear, human-readable explanations with suggested fixes.      |
-| → `security-vulnerability-root-cause-analyzer` | *Reference only — primary owner is the Security suite.*                                                                                       |
+
+The typical bug-resolution flow chains these skills end-to-end:
+
+```mermaid
+flowchart LR
+    REPORT([bug report])
+    REPRO[bug-reproduction-test-generator]
+    LOC[bug-localization]
+    RCA[regression-root-cause-analyzer]
+    PATCH[bug-to-patch-generator]
+    PRES[behavior-preservation-checker]
+    DONE([merge])
+
+    REPORT --> REPRO
+    REPRO -->|failing test| LOC
+    REPORT -.->|"'broke after commit X'"| RCA
+    RCA -->|guilty commit| LOC
+    LOC -->|fault location| PATCH
+    PATCH -->|candidate fix| PRES
+    PRES -->|pass| DONE
+    PRES -.->|fail| PATCH
+```
 
 ### Recommended additions — debugging
 
@@ -102,7 +143,6 @@ Automates the full software delivery pipeline from CI/CD configuration synthesis
 | `devops-release-notes-writer`                | Produces structured, human-readable release notes from diffs, commit messages, and issue tracker data.                                                          |
 | `devops-change-log-generator`                | Automatically generates changelogs following formats like Keep a Changelog or Conventional Commits from VCS history.                                            |
 | `devops-rollback-strategy-advisor`           | Recommends rollback procedures and strategies for failed deployments based on the deployment method and infrastructure.                                         |
-| → `security-time-aware-dependency-cve-scanner` | *Reference only — primary owner is the Security suite.*                                                                                                       |
 
 ### Recommended additions — devops
 
@@ -154,41 +194,22 @@ A thorough toolkit for maintaining and improving code health — from detecting 
 ---
 
 ## 4. Security Scanner Suite
-**Category:** security | **Tags:** security, vulnerability-detection, CVE, patching, taint-analysis
+**Category:** security | **Tags:** security, vulnerability-detection, CodeGuard, patching, taint-analysis
 
-A comprehensive security analysis toolkit covering vulnerability detection, CVE management, taint analysis, and automated patching.
+This suite **delegates to [Project CodeGuard](https://github.com/cosai-oasis/project-codeguard/tree/main/skills/software-security)** — the CoSAI open-source, model-agnostic secure-coding framework. Rather than maintaining a parallel vulnerability taxonomy, each skill below is a thin dispatcher: it detects the language and sink class, then applies the matching CodeGuard rule(s) (`codeguard-0-*`, `codeguard-1-*`).
 
-**Use Cases:** Security audits, CVE vulnerability management, automated security patching, dependency scanning, security-critical code monitoring.
+**Use Cases:** Pre-merge security review, CI security gates, CWE-to-remediation lookup, wiring taint analysis into a CodeQL/Semgrep pipeline.
 
-| Skill                                                      | Description                                                                                                                        |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `security-static-vulnerability-detector`                   | Scans code statically for security vulnerabilities such as injection flaws, insecure deserialization, and improper access control. |
-| `security-vulnerability-pattern-matcher`                   | Matches code patterns against a database of known vulnerability signatures (e.g., SQL injection, XSS, buffer overflows).           |
-| `security-vulnerability-root-cause-analyzer`               | Traces detected vulnerabilities back to their origin in the codebase for accurate remediation.                                     |
-| `security-exploitability-analyzer`                         | Assesses how exploitable a detected vulnerability is in practice, factoring in context, data flow, and attack surface.             |
-| ⁂ `security-patch-advisor`                                 | Recommends specific code changes or dependency upgrades to remediate identified security vulnerabilities.                          |
-| `security-cve-reachability-analyzer`                       | Determines whether a known CVE in a dependency is actually reachable/triggerable in the application's code paths.                  |
-| `security-cve-watchlist-action-recommendation-generator`   | For a list of watched CVEs, generates prioritized action recommendations (patch, mitigate, ignore) based on project context.       |
-| `security-time-aware-dependency-cve-scanner`               | Scans dependencies for CVEs with time-awareness, correlating vulnerability disclosure dates with dependency usage windows.         |
-| ⁂ `security-sensitive-path-instrumenter`                   | Instruments code paths that handle sensitive data (auth, encryption, PII) for monitoring and audit.                                |
-| `security-taint-instrumentation-assistant`                 | Assists in setting up taint tracking to trace untrusted input through the program and identify dangerous sinks.                    |
-| `security-critical-interval-security-checker`              | Checks security properties during critical execution intervals such as authentication windows or transaction boundaries.           |
-| → `debugging-static-bug-detector`                          | *Reference only — primary owner is the Bug-Fixing suite.*                                                                          |
-| → `debugging-semantic-bug-detector`                        | *Reference only — primary owner is the Bug-Fixing suite.*                                                                          |
+| Skill                              | Delegates to CodeGuard rule(s)                                                                                                                                             |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `static-vulnerability-detector`    | `input-validation-injection`, `xml-and-serialization`, `client-side-web-security`, `file-handling-and-uploads`, `authorization-access-control`, `api-web-services`         |
+| `vulnerability-pattern-matcher`    | `safe-c-functions`, `crypto-algorithms`, `additional-cryptography`, `hardcoded-credentials`, `digital-certificates`                                                        |
+| `taint-instrumentation-assistant`  | `input-validation-injection` (source/sink/sanitizer taxonomy) — translates to CodeQL / Semgrep taint configs                                                               |
+| `patch-advisor`                    | CWE → rule → fix-pattern dispatch across all CodeGuard rules                                                                                                               |
+| → `debugging-static-bug-detector`  | *Reference only — primary owner is the Bug-Fixing suite.*                                                                                                                  |
+| → `debugging-semantic-bug-detector`| *Reference only — primary owner is the Bug-Fixing suite.*                                                                                                                  |
 
-⁂ = original name already begins with `security`; prefix omitted under the redundant-stem rule.
-
-### Recommended additions — security
-
-| Proposed skill                              | Rationale — gap it fills                                                                                                                                                                    |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `security-secrets-scanner`                  | **Conspicuous gap for a secure-coding repo.** No skill hunts hardcoded API keys, tokens, private-key blocks, or connection strings — arguably the #1 practical finding in real-world audits. |
-| `security-crypto-misuse-detector`           | `static-vulnerability-detector` is general-purpose. This is the specialist: ECB mode, static IVs, MD5/SHA-1 signing, non-CSPRNG randomness, hardcoded keys, missing constant-time comparisons. |
-| `security-threat-model-generator`           | Every skill here is *reactive* (finds bugs in code that exists). Nothing is *proactive*. Generates STRIDE / attack-tree models from an architecture description before a line is written.   |
-| `security-authz-flow-analyzer`              | Taint tracking follows *data*; nothing follows *control*. Maps every privileged operation to its guarding authz check and flags operations reachable without one (IDOR / missing-auth hunter). |
-| `security-fuzz-harness-generator`           | `exploitability-analyzer` rates exploitability but doesn't *demonstrate* it. Generates libFuzzer / AFL / Jazzer harnesses targeting attacker-reachable parse and decode surfaces.            |
-| `security-input-boundary-mapper`            | Precursor to everything. Enumerates every trust boundary (HTTP params, env vars, file reads, IPC, deserialization) and tags each as validated / unvalidated — the map all other scanners need. |
-| `security-supply-chain-attestation-verifier`| The CVE scanners check *what* you depend on; nothing checks *provenance*. Verifies Sigstore signatures, SLSA attestations, and build reproducibility against `devops-sbom-generator` output. |
+No additional security skills are proposed — new coverage should land upstream in CodeGuard, not here.
 
 ---
 
@@ -361,8 +382,6 @@ Same table as [Cross-Cutting Ownership](#cross-cutting-ownership), sorted by the
 
 | Referencing suite | Pulls in                                                                                                                                                                                               |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| debugging         | `security-vulnerability-root-cause-analyzer`                                                                                                                                                           |
-| devops            | `security-time-aware-dependency-cve-scanner`                                                                                                                                                           |
 | code-quality      | `code-analysis-code-summarizer`, `code-analysis-legacy-code-summarizer`, `code-analysis-code-comment-generator`                                                                                        |
 | security          | `debugging-static-bug-detector`, `debugging-semantic-bug-detector`                                                                                                                                     |
 | code-analysis     | `code-quality-code-refactoring-assistant`, `code-quality-code-optimizer`, `code-quality-dead-code-eliminator`, `code-quality-behavior-preservation-checker`, `devops-build-ci-migration-assistant`     |
@@ -396,8 +415,9 @@ skills/
 │   └── ...
 ├── security/
 │   ├── static-vulnerability-detector/
-│   ├── vulnerability-root-cause-analyzer/
-│   └── ...
+│   ├── vulnerability-pattern-matcher/
+│   ├── taint-instrumentation-assistant/
+│   └── patch-advisor/
 ├── verification/
 │   ├── tlaplus-spec-generator/
 │   ├── requirement-to-tlaplus-property-generator/
