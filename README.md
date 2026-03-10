@@ -21,31 +21,6 @@ Names are lowercase letters, digits, and hyphens only; no leading/trailing or co
 
 Several skills serve more than one suite. Each is **defined once under its primary category** and merely *referenced* (not re-implemented) by secondary suites. Primary assignment follows the skill's core competency, not its consumer.
 
-```mermaid
-flowchart LR
-    DBG[debugging]
-    DEV[devops]
-    CQ[code-quality]
-    SEC[security]
-    VER[verification]
-    CA[code-analysis]
-    REQ[requirements]
-    TST[testing]
-
-    DBG -- 2 --> SEC
-    DBG -- 1 --> TST
-    CQ  -- 5 --> CA
-    CA  -- 3 --> CQ
-    DEV -- 1 --> CA
-    VER -- 2 --> REQ
-    VER -- 1 --> TST
-    REQ -- 1 --> TST
-
-    linkStyle 2 stroke-width:3px
-    linkStyle 3 stroke-width:3px
-```
-
-Edges are *suite-A lends N skills to suite-B*. `verification` is a pure producer (never consumes), `testing` a pure consumer (never lends). The thick `code-quality ⇄ code-analysis` pair is the only bidirectional coupling in the suite — quality gates transform code, understanding describes it, and each needs the other.
 
 | Skill                                      | Primary owner     | Referenced by             | Rationale                                                          |
 | ------------------------------------------ | ----------------- | ------------------------- | ------------------------------------------------------------------ |
